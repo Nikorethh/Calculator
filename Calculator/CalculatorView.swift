@@ -10,21 +10,21 @@ import SwiftUI
 struct CalculatorView: View {
     @State var viewModel = CalculatorViewModel()
             
-    @State var digitsArray: [String] = [
+    let digitsArray: [String] = [
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "."
     ]
         
-    @State var operation: String = ""
+    // @State var operation: String = ""
                     
 //    @State var isButtonPressed: Bool = false
     
-    @State var standardButtonColor: Color = Color("Button")
+    // @State var standardButtonColor: Color = Color("Button")
     
-    @State var standardButtonNumbers: [Int] = [1, 2, 3]
+    // @State var standardButtonNumbers: [Int] = [1, 2, 3]
     
-    var standardButtonWidthNormal: CGFloat = 64.0
+    let standardButtonWidthNormal: CGFloat = 64.0
     
-    var standardButtonWidthLarge: CGFloat = 152.0
+    let standardButtonWidthLarge: CGFloat = 152.0
         
     func resizableText() -> some View {
         let resizableFontSize: CGFloat
