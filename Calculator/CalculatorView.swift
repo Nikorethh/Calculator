@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct CalculatorView: View {
-    @State var textInfoArray: [String] = []
+    @State var viewModel = CalculatorViewModel()
     
-    @State var textInfo: String = "0"
+    @State var textInfoArray: [String] = []
     
     @State var simplifiedTextInfo: String = ""
     
@@ -55,16 +55,16 @@ struct CalculatorView: View {
             
             switch symbol {
             case "Delete":
-                if textInfo.count != 1 {
-                    textInfo.removeLast()
+                if viewModel.textInfo.count != 1 {
+                    viewModel.textInfo.removeLast()
                 } else {
-                    textInfo = "0"
+                    viewModel.textInfo = "0"
                 }
             case "PlusMinus":
                 var temporaryArrayOfNumbers: [String] = []
                 var temporaryArrayOfOperations: [String] = []
                 var finalArray: [String] = []
-                var temporaryTextInfo: String = textInfo
+                var temporaryTextInfo: String = viewModel.textInfo
                 var number: String = ""
                 
                 temporaryTextInfo.append("=")
@@ -107,7 +107,7 @@ struct CalculatorView: View {
                     finalArray.append(lastNumber)
                     finalArray.append(")")
                     
-                    textInfo = finalArray.joined()
+                    viewModel.textInfo = finalArray.joined()
                 } else if plusMinusIsActive == false && finalArray.last!.last == ")" {
                     var lastNumber = finalArray.removeLast()
                     
@@ -120,7 +120,7 @@ struct CalculatorView: View {
                     
                     finalArray.append(lastNumber)
                     
-                    textInfo = finalArray.joined()
+                    viewModel.textInfo = finalArray.joined()
                 } else {
                     let lastNumber: String = finalArray.removeLast()
                     finalArray.append("(")
@@ -128,7 +128,7 @@ struct CalculatorView: View {
                     finalArray.append(lastNumber)
                     finalArray.append(")")
                     
-                    textInfo = finalArray.joined()
+                    viewModel.textInfo = finalArray.joined()
                     
                     plusMinusIsActive.toggle()
                 }
@@ -145,213 +145,29 @@ struct CalculatorView: View {
             case "Plus":
                 operation += "+"
             case "Equal":
-                caption = textInfo
-                if textInfo.contains("(") || textInfo.contains(")") {
-                    simplifiedTextInfo = getSimpifiedTextInfo()
+                caption = viewModel.textInfo
+                if viewModel.textInfo.contains("(") || viewModel.textInfo.contains(")") {
+                    simplifiedTextInfo = viewModel.getSimpifiedTextInfo()
                 } else {
-                    simplifiedTextInfo = textInfo
+                    simplifiedTextInfo = viewModel.textInfo
                 }
                 getMathData()
                 defineCompoundOperations()
                 getCalculations()
-                textInfo = showDecimalNumbers()
+                viewModel.textInfo = showDecimalNumbers()
             default:
-                if textInfo.first == "0" {
-                    textInfo.removeFirst()
-                    textInfo += symbol
+                if viewModel.textInfo.first == "0" {
+                    viewModel.textInfo.removeFirst()
+                    viewModel.textInfo += symbol
                 } else {
-                    textInfo += symbol
+                    viewModel.textInfo += symbol
                 }
                 
             }
-            textInfo += operation
+            viewModel.textInfo += operation
         }
     }
-    
-    func getSimpifiedTextInfo() -> String {
-        var temporaryTextInfo: String = textInfo
-        var arrayOfCompoundData: [String] = []
-        var arrayOfOrdinaryData: [String] = []
-        var commonArray: [String] = []
-        var result: String = ""
-        var firstSymbol: String = ""
-        var stringToAdd: String = ""
-        temporaryTextInfo += "="
-
-        var firstSymbolIsBracket: Bool = false
-
-        if textInfo.first == "(" {
-            firstSymbolIsBracket = true
-        }
-
-        while !temporaryTextInfo.isEmpty {
-            
-            firstSymbol = String(describing: temporaryTextInfo.removeFirst())
-            
-            if firstSymbol == "(" {
-                
-                firstSymbol = ""
-                arrayOfOrdinaryData.append(stringToAdd)
-                stringToAdd = ""
-                
-                while temporaryTextInfo.first != ")" {
-                    stringToAdd += String(temporaryTextInfo.removeFirst())
-                }
-                arrayOfCompoundData.append(stringToAdd)
-                temporaryTextInfo.removeFirst()
-                stringToAdd = ""
-                
-            } else if firstSymbol == "=" {
-                arrayOfOrdinaryData.append(stringToAdd)
-            }
-            
-            stringToAdd += firstSymbol
-            
-        }
-
-        if arrayOfOrdinaryData.first == "" {
-            arrayOfOrdinaryData.removeFirst()
-        }
-
-        if arrayOfOrdinaryData.last == "" {
-            arrayOfOrdinaryData.removeLast()
-        }
-
-        let counterForArayOfOrdinaryData: Int = arrayOfOrdinaryData.count
-        let counterForArrayOfCompoundData: Int = arrayOfCompoundData.count
-
-        if counterForArayOfOrdinaryData > counterForArrayOfCompoundData && firstSymbolIsBracket == false {
-            
-            while !arrayOfOrdinaryData.isEmpty {
-                
-                if !arrayOfOrdinaryData.isEmpty {
-                    let firstElement = arrayOfOrdinaryData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-                if !arrayOfCompoundData.isEmpty {
-                    let firstElement = arrayOfCompoundData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-            }
-            
-        } else if counterForArayOfOrdinaryData < counterForArrayOfCompoundData && firstSymbolIsBracket == false {
-            
-            while !arrayOfCompoundData.isEmpty {
-                
-                if !arrayOfOrdinaryData.isEmpty {
-                    let firstElement = arrayOfOrdinaryData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-                if !arrayOfCompoundData.isEmpty {
-                    let firstElement = arrayOfCompoundData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-            }
-            
-        } else if counterForArayOfOrdinaryData == counterForArrayOfCompoundData && firstSymbolIsBracket == false {
-            
-            while !arrayOfCompoundData.isEmpty {
-                
-                if !arrayOfOrdinaryData.isEmpty {
-                    let firstElement = arrayOfOrdinaryData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-                if !arrayOfCompoundData.isEmpty {
-                    let firstElement = arrayOfCompoundData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-            }
-            
-        } else if counterForArayOfOrdinaryData < counterForArrayOfCompoundData && firstSymbolIsBracket == true {
-            
-            while !arrayOfCompoundData.isEmpty {
-                
-                if !arrayOfCompoundData.isEmpty {
-                    let firstElement = arrayOfCompoundData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-                if !arrayOfOrdinaryData.isEmpty {
-                    let firstElement = arrayOfOrdinaryData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-            }
-            
-        } else if counterForArayOfOrdinaryData > counterForArrayOfCompoundData && firstSymbolIsBracket == true {
-            
-            while !arrayOfCompoundData.isEmpty {
-                
-                if !arrayOfCompoundData.isEmpty {
-                    let firstElement = arrayOfCompoundData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-                if !arrayOfOrdinaryData.isEmpty {
-                    let firstElement = arrayOfOrdinaryData.removeFirst()
-                    commonArray.append(firstElement)
-                }
-                
-            }
-            
-        } else if counterForArayOfOrdinaryData == counterForArrayOfCompoundData && firstSymbolIsBracket == true {
-            
-            while !arrayOfCompoundData.isEmpty && !arrayOfOrdinaryData.isEmpty {
-                    let firstElement = arrayOfCompoundData.removeFirst()
-                    commonArray.append(firstElement)
-                
-                    let secondElement = arrayOfOrdinaryData.removeFirst()
-                    commonArray.append(secondElement)
-                }
-        }
-            
-        result = commonArray.joined()
-
-        var symbols: String = ""
-        var compoundOperation: String = ""
-
-        while !result.isEmpty {
-            
-            let firstSymbol = String(describing: result.removeFirst())
-            
-            switch firstSymbol {
-            case "+", "-", "*", "/", "%":
-                if result.first == "-" {
-                    compoundOperation += firstSymbol + String(describing: result.removeFirst())
-                    
-                    switch compoundOperation {
-                    case "+-":
-                        symbols += "-"
-                    case "--":
-                        symbols += "+"
-                    case "*-":
-                        symbols += "&"
-                    case "/-":
-                        symbols += "@"
-                    default:
-                        symbols += "$"
-                    }
-                    
-                    compoundOperation = ""
-                    
-                } else {
-                    symbols += firstSymbol
-                }
-            default:
-                symbols += firstSymbol
-            }
-        }
-
-        result = symbols
-        return result
-    }
-    
+        
     func getMathData() {
         var symbols: String = simplifiedTextInfo
         var number: String = ""
@@ -602,7 +418,7 @@ struct CalculatorView: View {
     func resizableText() -> some View {
         let resizableFontSize: CGFloat
         
-        switch textInfo.count {
+        switch viewModel.textInfo.count {
         case 0...8:
             resizableFontSize = 64.0
         case 9...12:
@@ -613,7 +429,7 @@ struct CalculatorView: View {
             resizableFontSize = 32.0
         }
         
-        return Text(textInfo)
+        return Text(viewModel.textInfo)
             .fixedSize()
             .foregroundStyle(Color("Text"))
             .font(.custom("Inter18pt-SemiBold", size: resizableFontSize))
@@ -705,35 +521,6 @@ struct CalculatorView: View {
     }
 }
     
-struct StandardButtonView: View {
-    
-    @State var buttonColor: Color = Color("Button")
-    @Binding var standardButtonWidth: CGFloat
-    @Binding var standardButtonNumber: String
-    @Binding var textInfoArray: [String]
-    let showTextInfo: () -> Void
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: 16.0)
-            .fill(buttonColor)
-            .frame(width: standardButtonWidth, height: 64.0)
-            .overlay(
-                Text(standardButtonNumber)
-                    .foregroundStyle(Color("Text"))
-                    .font(.custom("Inter18pt-SemiBold", size: 24.0))
-            )
-        
-            .onTapGesture {
-                textInfoArray.append(standardButtonNumber)
-                buttonColor = Color("ButtonPress")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    buttonColor = Color("Button")
-                }
-                showTextInfo()
-            }
-    }
-}
-
 //#Preview {
 //    CalculatorView(lightThemeIsActive: $lightThemeIsActive)
 //}
