@@ -3,6 +3,7 @@ import SwiftUI
 @Observable
 class CalculatorViewModel {
     var textInfo: String = "0"
+    var lightThemeIsActive: Bool = true
     
     func getSimpifiedTextInfo() -> String {
         var temporaryTextInfo: String = textInfo

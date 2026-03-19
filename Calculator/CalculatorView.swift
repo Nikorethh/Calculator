@@ -44,9 +44,6 @@ struct CalculatorView: View {
     
     @State var standardButtonWidthLarge: CGFloat = 152.0
     
-    @Binding var lightThemeIsActive: Bool
-    
-    
     func showTextInfo() {
         
         while textInfoArray.count != 0 {
@@ -439,7 +436,6 @@ struct CalculatorView: View {
     }
         
     var body: some View {
-        
         ZStack(alignment: .bottom) {
             
             Color("Background")
@@ -449,7 +445,7 @@ struct CalculatorView: View {
                 
                 Spacer(minLength: 2.0)
                 
-                TabBarView(lightThemeIsActive: $lightThemeIsActive)
+                TabBarView(lightThemeIsActive: viewModel.lightThemeIsActive)
                 
                 Rectangle()
                     .fill(Color("Background"))
@@ -518,6 +514,7 @@ struct CalculatorView: View {
                 }
             }
         }
+        .preferredColorScheme(viewModel.lightThemeIsActive ? .light : .dark)
     }
 }
     

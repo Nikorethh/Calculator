@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct TabBarView: View {
-    
-    @Binding var lightThemeIsActive: Bool
+    let lightThemeIsActive: Bool
     
     var body: some View {
         HStack(spacing: 0.0) {
@@ -23,9 +22,9 @@ struct TabBarView: View {
                     .frame(width: 24.0, height: 24.0)
             )
             .onTapGesture {
-                if lightThemeIsActive == false {
+                /*if lightThemeIsActive == false {
                     lightThemeIsActive.toggle()
-                }
+                }*/
             }
             
             UnevenRoundedRectangle(
@@ -45,9 +44,9 @@ struct TabBarView: View {
                     .frame(width: 24.0, height: 24.0)
             )
             .onTapGesture {
-                if lightThemeIsActive == true {
+                /*if lightThemeIsActive == true {
                     lightThemeIsActive.toggle()
-                }
+                }*/
             }
         }
     }
