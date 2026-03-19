@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct CalculatorView: View {
-    
     @State var textInfoArray: [String] = []
     
     @State var textInfo: String = "0"
