@@ -60,7 +60,7 @@ struct CalculatorView: View {
                 Spacer(minLength: 2.0)
                 
                 TabBarView(
-                    lightThemeIsActive: viewModel.lightThemeIsActive,
+                    lightThemeIsActive: viewModel.model.lightThemeIsActive,
                     onSwitchPressed: {
                         viewModel.handleSwitchPressed(isLight: $0)
                     }
@@ -200,7 +200,7 @@ struct CalculatorView: View {
                 }
             }
         }
-        .preferredColorScheme(viewModel.lightThemeIsActive ? .light : .dark)
+        .preferredColorScheme(viewModel.model.lightThemeIsActive ? .light : .dark)
     }
 }
     

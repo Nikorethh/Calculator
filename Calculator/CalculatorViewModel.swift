@@ -1,12 +1,17 @@
 import SwiftUI
 
+struct CalculatorModel {
+    var lightThemeIsActive = true
+}
+
 @Observable
 class CalculatorViewModel {
+    var model = CalculatorModel()
+    
     var textInfo: String = "0"
     var arrayOfNumbers: [Double] = []
     var textInfoArray: [String] = []
     var plusMinusIsActive: Bool = false
-    var lightThemeIsActive: Bool = true
     var arrayOfOperations: [String] = []
     var caption: String = ""
     var simplifiedTextInfo: String = ""
@@ -16,7 +21,7 @@ class CalculatorViewModel {
     ]
     
     func handleSwitchPressed(isLight: Bool) {
-        lightThemeIsActive.toggle()
+        model.lightThemeIsActive.toggle()
     }
     
     func getSimpifiedTextInfo() -> String {

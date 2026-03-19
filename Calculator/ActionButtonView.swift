@@ -2,7 +2,6 @@ import SwiftUI
 
 // Make Action Buttons and Animations for them
 struct ActionButtonView: View {
-    
     @State var buttonColor: Color = Color("ActionButton")
     let icon: String
     let addIcon: (String) -> Void
