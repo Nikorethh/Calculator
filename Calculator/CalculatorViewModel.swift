@@ -5,6 +5,10 @@ class CalculatorViewModel {
     var textInfo: String = "0"
     var lightThemeIsActive: Bool = true
     
+    func handleSwitchPressed(isLight: Bool) {
+        lightThemeIsActive.toggle()
+    }
+    
     func getSimpifiedTextInfo() -> String {
         var temporaryTextInfo: String = textInfo
         var arrayOfCompoundData: [String] = []

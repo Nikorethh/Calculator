@@ -445,7 +445,12 @@ struct CalculatorView: View {
                 
                 Spacer(minLength: 2.0)
                 
-                TabBarView(lightThemeIsActive: viewModel.lightThemeIsActive)
+                TabBarView(
+                    lightThemeIsActive: viewModel.lightThemeIsActive,
+                    onSwitchPressed: {
+                        viewModel.handleSwitchPressed(isLight: $0)
+                    }
+                )
                 
                 Rectangle()
                     .fill(Color("Background"))
