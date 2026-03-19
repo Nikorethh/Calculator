@@ -3,9 +3,9 @@ import SwiftUI
 struct StandardButtonView: View {
     
     @State var buttonColor: Color = Color("Button")
-    @Binding var standardButtonWidth: CGFloat
-    @Binding var standardButtonNumber: String
-    @Binding var textInfoArray: [String]
+    let standardButtonWidth: CGFloat
+    let standardButtonNumber: String
+    let onAddNumber: (String) -> Void
     let showTextInfo: () -> Void
     
     var body: some View {
@@ -19,7 +19,8 @@ struct StandardButtonView: View {
             )
         
             .onTapGesture {
-                textInfoArray.append(standardButtonNumber)
+                // textInfoArray.append(standardButtonNumber)
+                onAddNumber(standardButtonNumber)
                 buttonColor = Color("ButtonPress")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     buttonColor = Color("Button")

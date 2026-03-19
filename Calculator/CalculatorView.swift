@@ -9,409 +9,23 @@ import SwiftUI
 
 struct CalculatorView: View {
     @State var viewModel = CalculatorViewModel()
-    
-    @State var textInfoArray: [String] = []
-    
-    @State var simplifiedTextInfo: String = ""
-    
-    @State var symbolArray: [String] = [
-        "Delete", "PlusMinus", "Percent", "Divide", "Multiply", "Minus", "Plus", "Equal"
-    ]
-    
+            
     @State var digitsArray: [String] = [
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "."
     ]
-    
-    @State var caption: String = ""
-    
+        
     @State var operation: String = ""
-    
-    @State var arrayOfOperations: [String] = []
-    
-    @State var arrayOfNumbers: [Double] = []
-    
-    @State var plusMinusIsActive: Bool = false
-    
-    @State var isNumber: Bool = false
-    
+                    
 //    @State var isButtonPressed: Bool = false
     
     @State var standardButtonColor: Color = Color("Button")
     
     @State var standardButtonNumbers: [Int] = [1, 2, 3]
     
-    @State var standardButtonWidthNormal: CGFloat = 64.0
+    var standardButtonWidthNormal: CGFloat = 64.0
     
-    @State var standardButtonWidthLarge: CGFloat = 152.0
-    
-    func showTextInfo() {
+    var standardButtonWidthLarge: CGFloat = 152.0
         
-        while textInfoArray.count != 0 {
-            let symbol = textInfoArray.removeFirst()
-            var operation: String = ""
-            
-            switch symbol {
-            case "Delete":
-                if viewModel.textInfo.count != 1 {
-                    viewModel.textInfo.removeLast()
-                } else {
-                    viewModel.textInfo = "0"
-                }
-            case "PlusMinus":
-                var temporaryArrayOfNumbers: [String] = []
-                var temporaryArrayOfOperations: [String] = []
-                var finalArray: [String] = []
-                var temporaryTextInfo: String = viewModel.textInfo
-                var number: String = ""
-                
-                temporaryTextInfo.append("=")
-                
-                while temporaryTextInfo.count != 0 {
-                    let symbol = temporaryTextInfo.removeFirst()
-                    
-                    switch symbol {
-                    case "+", "-", "*", "/":
-                        temporaryArrayOfOperations.append(String(symbol))
-                        temporaryArrayOfNumbers.append(number)
-                        number = ""
-                    case "=":
-                        temporaryArrayOfNumbers.append(number)
-                        number = ""
-                    default:
-                        number += String(symbol)
-                    }
-                }
-                
-                while temporaryArrayOfNumbers.count != 0 {
-                    if temporaryArrayOfNumbers.count != 0 && temporaryArrayOfOperations.count != 0 {
-                        let number = temporaryArrayOfNumbers.removeFirst()
-                        finalArray.append(number)
-                        
-                        let operation = temporaryArrayOfOperations.removeFirst()
-                        finalArray.append(operation)
-                    } else if temporaryArrayOfNumbers.count != 0 && temporaryArrayOfOperations.count == 0 {
-                        let number = temporaryArrayOfNumbers.removeFirst()
-                        finalArray.append(number)
-                    }
-                }
-                
-                plusMinusIsActive.toggle()
-                
-                if plusMinusIsActive == true {
-                    let lastNumber: String = finalArray.removeLast()
-                    finalArray.append("(")
-                    finalArray.append("-")
-                    finalArray.append(lastNumber)
-                    finalArray.append(")")
-                    
-                    viewModel.textInfo = finalArray.joined()
-                } else if plusMinusIsActive == false && finalArray.last!.last == ")" {
-                    var lastNumber = finalArray.removeLast()
-                    
-                    if lastNumber.last == ")" {
-                        lastNumber.removeLast()
-                    }
-                    
-                    finalArray.removeLast()
-                    finalArray.removeLast()
-                    
-                    finalArray.append(lastNumber)
-                    
-                    viewModel.textInfo = finalArray.joined()
-                } else {
-                    let lastNumber: String = finalArray.removeLast()
-                    finalArray.append("(")
-                    finalArray.append("-")
-                    finalArray.append(lastNumber)
-                    finalArray.append(")")
-                    
-                    viewModel.textInfo = finalArray.joined()
-                    
-                    plusMinusIsActive.toggle()
-                }
-                
-                
-            case "Percent":
-                operation = "%"
-            case "Divide":
-                operation += "/"
-            case "Multiply":
-                operation += "*"
-            case "Minus":
-                operation += "-"
-            case "Plus":
-                operation += "+"
-            case "Equal":
-                caption = viewModel.textInfo
-                if viewModel.textInfo.contains("(") || viewModel.textInfo.contains(")") {
-                    simplifiedTextInfo = viewModel.getSimpifiedTextInfo()
-                } else {
-                    simplifiedTextInfo = viewModel.textInfo
-                }
-                getMathData()
-                defineCompoundOperations()
-                getCalculations()
-                viewModel.textInfo = showDecimalNumbers()
-            default:
-                if viewModel.textInfo.first == "0" {
-                    viewModel.textInfo.removeFirst()
-                    viewModel.textInfo += symbol
-                } else {
-                    viewModel.textInfo += symbol
-                }
-                
-            }
-            viewModel.textInfo += operation
-        }
-    }
-        
-    func getMathData() {
-        var symbols: String = simplifiedTextInfo
-        var number: String = ""
-        var counter: Int = 0
-        var storageOfWrongCalculations: [Int] = []
-        
-        if symbols.count != 0 {
-            symbols.append("=")
-        }
-        
-        while symbols.count != 0 {
-            let symbol = symbols.removeFirst()
-            
-            switch symbol {
-            case "+":
-                arrayOfOperations.append("+")
-                if isNumber == true {
-                    arrayOfNumbers.append(Double("-" + number) ?? 0)
-                    isNumber.toggle()
-                } else {
-                    arrayOfNumbers.append(Double(number) ?? 0)
-                }
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                number = ""
-                counter += 1
-            case "-":
-                arrayOfOperations.append("-")
-                if isNumber == true {
-                    arrayOfNumbers.append(Double("-" + number) ?? 0)
-                    isNumber.toggle()
-                } else {
-                    arrayOfNumbers.append(Double(number) ?? 0)
-                }
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                number = ""
-                counter += 1
-            case "*":
-                arrayOfOperations.append("*")
-                if isNumber == true {
-                    arrayOfNumbers.append(Double("-" + number) ?? 0)
-                    isNumber.toggle()
-                } else {
-                    arrayOfNumbers.append(Double(number) ?? 0)
-                }
-                number = ""
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                counter += 1
-            case "/":
-                arrayOfOperations.append("/")
-                if isNumber == true {
-                    arrayOfNumbers.append(Double("-" + number) ?? 0)
-                    isNumber.toggle()
-                } else {
-                    arrayOfNumbers.append(Double(number) ?? 0)
-                }
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                number = ""
-                counter += 1
-            case "%":
-                arrayOfOperations.append("%")
-                arrayOfNumbers.append(Double(number) ?? 0)
-                number = ""
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                counter += 1
-                isNumber = true
-            case "&":
-                arrayOfOperations.append("*")
-                arrayOfNumbers.append(Double(number) ?? 0)
-                number = ""
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                counter += 1
-                isNumber.toggle()
-            case "@":
-                arrayOfOperations.append("/")
-                arrayOfNumbers.append(Double(number) ?? 0)
-                number = ""
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                counter += 1
-                isNumber.toggle()
-            case "=":
-                arrayOfNumbers.append(Double(number) ?? 0)
-                number = ""
-                if arrayOfNumbers.last == 0 {
-                    storageOfWrongCalculations.append(counter)
-                }
-                counter += 1
-            default:
-                number += String(symbol)
-            }
-        }
-        
-        while storageOfWrongCalculations.count != 0 {
-            let wrongCalculation = storageOfWrongCalculations.removeFirst()
-            
-            arrayOfNumbers.remove(at: wrongCalculation)
-        }
-    }
-    
-    func defineCompoundOperations() {
-        var temporaryArrayOfOperations: [String] = arrayOfOperations
-        var arrayOfcompoundOperations: [String] = []
-        var indicesOfCompoundOperations: [Int] = []
-        var arrayOfPercentOperations: [String] = []
-        var indicesOfPercentOperations: [Int] = []
-        var counter: Int = 0
-        
-        while temporaryArrayOfOperations.count != 0 {
-            let operation = temporaryArrayOfOperations.removeFirst()
-                
-            switch operation {
-            case "*":
-                counter += 1
-                arrayOfcompoundOperations.append(operation)
-                indicesOfCompoundOperations.append(counter - 1)
-            case "/":
-                counter += 1
-                arrayOfcompoundOperations.append(operation)
-                indicesOfCompoundOperations.append(counter - 1)
-            case "%":
-                counter += 1
-                arrayOfPercentOperations.append(operation)
-                indicesOfPercentOperations.append(counter - 1)
-            default:
-                counter += 1
-            }
-        }
-        
-        
-        while arrayOfPercentOperations.count != 0 {
-            let percentOperation = arrayOfPercentOperations.removeFirst()
-            
-            let mathAction = arrayOfNumbers[indicesOfPercentOperations[0]] * 0.01
-            arrayOfNumbers.remove(at: indicesOfPercentOperations[0])
-            arrayOfNumbers.insert(mathAction, at: indicesOfCompoundOperations[0] + 1)
-            arrayOfOperations.remove(at: indicesOfPercentOperations[0])
-            indicesOfPercentOperations.remove(at: 0)
-            if !indicesOfPercentOperations.isEmpty {
-                var number = indicesOfPercentOperations[0]
-                number -= 1
-                indicesOfPercentOperations.remove(at: 0)
-                indicesOfPercentOperations.insert(number, at: 0)
-            }
-        }
-        
-        while arrayOfcompoundOperations.count != 0 {
-            let compoundOperation = arrayOfcompoundOperations.removeFirst()
-                
-            switch compoundOperation {
-            case "*":
-                let mathAction = arrayOfNumbers[indicesOfCompoundOperations[0]] * arrayOfNumbers[indicesOfCompoundOperations[0] + 1]
-                arrayOfNumbers.remove(atOffsets: [indicesOfCompoundOperations[0], indicesOfCompoundOperations[0] + 1])
-                arrayOfNumbers.insert(mathAction, at: indicesOfCompoundOperations[0])
-                arrayOfOperations.remove(at: indicesOfCompoundOperations[0])
-                indicesOfCompoundOperations.remove(at: 0)
-                if !indicesOfCompoundOperations.isEmpty {
-                    var number = indicesOfCompoundOperations[0]
-                    number -= 1
-                    indicesOfCompoundOperations.remove(at: 0)
-                    indicesOfCompoundOperations.insert(number, at: 0)
-                }
-            case "/":
-                let mathAction = arrayOfNumbers[indicesOfCompoundOperations[0]] / arrayOfNumbers[indicesOfCompoundOperations[0] + 1]
-                arrayOfNumbers.remove(atOffsets: [indicesOfCompoundOperations[0], indicesOfCompoundOperations[0] + 1])
-                arrayOfOperations.remove(at: indicesOfCompoundOperations[0])
-                arrayOfNumbers.insert(mathAction, at: indicesOfCompoundOperations[0])
-                indicesOfCompoundOperations.remove(at: 0)
-                if !indicesOfCompoundOperations.isEmpty {
-                    var number = indicesOfCompoundOperations[0]
-                    number -= 1
-                    indicesOfCompoundOperations.remove(at: 0)
-                    indicesOfCompoundOperations.insert(number, at: 0)
-                }
-            case "%":
-                let mathAction = arrayOfNumbers[indicesOfCompoundOperations[0]] * 0.01
-                arrayOfNumbers.remove(at: indicesOfCompoundOperations[0])
-                arrayOfOperations.remove(at: indicesOfCompoundOperations[0])
-                arrayOfNumbers.insert(mathAction, at: indicesOfCompoundOperations[0])
-                if !indicesOfCompoundOperations.isEmpty {
-                    var number = indicesOfCompoundOperations[0]
-                    number -= 1
-                    indicesOfCompoundOperations.remove(at: 0)
-                    indicesOfCompoundOperations.insert(number, at: 0)
-                }
-            default:
-                break
-                }
-            }
-        }
-    
-    func getCalculations() {
-        
-        while arrayOfNumbers.count != 1 && arrayOfOperations.count != 0 {
-            print(arrayOfOperations)
-            print(arrayOfNumbers)
-            let operation = arrayOfOperations.removeFirst()
-            
-            switch operation {
-            case "+":
-                let mathAction = arrayOfNumbers[0] + arrayOfNumbers[1]
-                arrayOfNumbers.remove(atOffsets: [0, 1])
-                arrayOfNumbers.insert(mathAction, at: 0)
-            case "-":
-                let mathAction = arrayOfNumbers[0] - arrayOfNumbers[1]
-                arrayOfNumbers.remove(atOffsets: [0, 1])
-                arrayOfNumbers.insert(mathAction, at: 0)
-            default:
-                break
-            }
-        }
-    }
-    
-    func showDecimalNumbers() -> String {
-        var number = String(arrayOfNumbers[0])
-        var lastNumbers: [String] = []
-        
-        while number.last != "." {
-            let symbol = number.removeLast()
-            
-            if symbol != "." {
-                lastNumbers.append(String(symbol))
-            }
-        }
-        
-        lastNumbers.reverse()
-        let combinedInfo = lastNumbers.joined()
-        
-        if Double(combinedInfo)! > 0 {
-            return String(arrayOfNumbers.removeFirst())
-        } else {
-            return String(Int(arrayOfNumbers.removeFirst()))
-        }
-    }
-    
     func resizableText() -> some View {
         let resizableFontSize: CGFloat
         
@@ -456,7 +70,7 @@ struct CalculatorView: View {
                     .fill(Color("Background"))
                 
                 VStack(alignment: .trailing, spacing: 0) {
-                    Text(caption)
+                    Text(viewModel.caption)
                         .foregroundStyle(Color("Caption"))
                         .font(.custom("Inter18pt-SemiBold", size: 18.0))
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -482,38 +96,105 @@ struct CalculatorView: View {
                         
                         HStack(spacing: 24.0) {
                             ForEach(0..<4) { icon in
-                                ActionButtonView(icon: $symbolArray[icon], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                                ActionButtonView(
+                                    icon: viewModel.symbolArray[icon],
+                                    addIcon: { icon in
+                                        viewModel.textInfoArray.append(icon)
+                                    },
+                                    showTextInfo: viewModel.showTextInfo
+                                )
                             }
                         }
                         
                         HStack(spacing: 24.0) {
                             ForEach(0..<3) { number in
-                                StandardButtonView(standardButtonWidth: $standardButtonWidthNormal, standardButtonNumber: $digitsArray[number], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                                StandardButtonView(
+                                    standardButtonWidth: standardButtonWidthNormal,
+                                    standardButtonNumber: digitsArray[number],
+                                    onAddNumber: { value in
+                                        viewModel.textInfoArray.append(value)
+                                    },
+                                    showTextInfo: viewModel.showTextInfo
+                                )
                             }
                             
-                            ActionButtonView(icon: $symbolArray[4], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                            ActionButtonView(
+                                icon: viewModel.symbolArray[4],
+                                addIcon: { icon in
+                                    viewModel.textInfoArray.append(icon)
+                                },
+                                showTextInfo: viewModel.showTextInfo
+                            )
                         }
                         
                         HStack(spacing: 24.0) {
                             ForEach(3..<6) { number in
-                                StandardButtonView(standardButtonWidth: $standardButtonWidthNormal, standardButtonNumber: $digitsArray[number], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                                StandardButtonView(
+                                    standardButtonWidth: standardButtonWidthNormal,
+                                    standardButtonNumber: digitsArray[number],
+                                    onAddNumber: { value in
+                                        viewModel.textInfoArray.append(value)
+                                    },
+                                    showTextInfo: viewModel.showTextInfo
+                                )
                             }
                             
-                            ActionButtonView(icon: $symbolArray[5], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                            ActionButtonView(
+                                icon: viewModel.symbolArray[5],
+                                addIcon: { icon in
+                                    viewModel.textInfoArray.append(icon)
+                                },
+                                showTextInfo: viewModel.showTextInfo
+                            )
                         }
                         
                         HStack(spacing: 24.0) {
                             ForEach(6..<9) { number in
-                                StandardButtonView(standardButtonWidth: $standardButtonWidthNormal, standardButtonNumber: $digitsArray[number], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                                StandardButtonView(
+                                    standardButtonWidth: standardButtonWidthNormal,
+                                    standardButtonNumber: digitsArray[number],
+                                    onAddNumber: { value in
+                                        viewModel.textInfoArray.append(value)
+                                    },
+                                    showTextInfo: viewModel.showTextInfo
+                                )
                             }
                             
-                            ActionButtonView(icon: $symbolArray[6], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                            ActionButtonView(
+                                icon: viewModel.symbolArray[6],
+                                addIcon: { icon in
+                                    viewModel.textInfoArray.append(icon)
+                                },
+                                showTextInfo: viewModel.showTextInfo
+                            )
                         }
                         
                         HStack(spacing: 24.0) {
-                            StandardButtonView(standardButtonWidth: $standardButtonWidthLarge, standardButtonNumber: $digitsArray[9], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
-                            StandardButtonView(standardButtonWidth: $standardButtonWidthNormal, standardButtonNumber: $digitsArray[10], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
-                            ActionButtonView(icon: $symbolArray[7], textInfoArray: $textInfoArray, showTextInfo: showTextInfo)
+                            StandardButtonView(
+                                standardButtonWidth: standardButtonWidthLarge,
+                                standardButtonNumber: digitsArray[9],
+                                onAddNumber: { value in
+                                    viewModel.textInfoArray.append(value)
+                                },
+                                showTextInfo: viewModel.showTextInfo
+                            )
+                            
+                            StandardButtonView(
+                                standardButtonWidth: standardButtonWidthNormal,
+                                standardButtonNumber: digitsArray[10],
+                                onAddNumber: { value in
+                                    viewModel.textInfoArray.append(value)
+                                },
+                                showTextInfo: viewModel.showTextInfo
+                            )
+                            
+                            ActionButtonView(
+                                icon: viewModel.symbolArray[7],
+                                addIcon: { icon in
+                                    viewModel.textInfoArray.append(icon)
+                                },
+                                showTextInfo: viewModel.showTextInfo
+                            )
                         }
                     }
                 }
